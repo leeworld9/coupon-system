@@ -48,9 +48,6 @@ public class Coupon {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @Version
-    private Long version;
-
     @Builder
     public Coupon(String name, Integer discountRate, Integer totalQuantity,
                   LocalDateTime startDate, LocalDateTime endDate) {

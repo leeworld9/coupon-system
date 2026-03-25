@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/coupons")
@@ -32,9 +33,24 @@ public class CouponController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping("/{couponId}/stock")
+    public ResponseEntity<Map<String, Object>> getStock(@PathVariable Long couponId) {
+        Map<String, Object> stock = couponService.getStock(couponId);
+        return ResponseEntity.ok(stock);
+    }
+
     @GetMapping("/my-coupons")
     public ResponseEntity<List<CouponIssueResponseDto>> getMyCoupons(
             @RequestParam Long userId) {
         return ResponseEntity.ok(couponService.getMyCoupons(userId));
     }
+
+    @PostMapping("/{couponId}/issue-redis")
+    public ResponseEntity<CouponIssueResponseDto> issueCouponWithRedis(
+            @PathVariable Long couponId,
+            @Valid @RequestBody CouponIssueRequestDto request) {
+        CouponIssueResponseDto response = couponService.issueCouponWithRedis(couponId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
 }
