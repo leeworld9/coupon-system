@@ -87,43 +87,29 @@
 
 ---
 
-## 📡 API 명세
+## 💡 핵심 학습
 
-### 관리자 API
+**성능 최적화 경험:**
+- Pessimistic Lock의 순차 처리 병목을 Redis 도입으로 62% 개선
+- 트랜잭션 범위 최적화로 추가 71% 개선 (최종 2.8배)
 
-| Method | Endpoint | Request Body | 설명 |
-|--------|----------|--------------|------|
-| POST | `/api/admin/coupons` | `name`, `discountRate`, `totalQuantity`, `startDate`, `endDate` | 쿠폰 생성 |
+**측정 방법론:**
+- 단일 측정의 변동성 발견 (TPS 995 → 1552 편차)
+- 3회 반복 측정으로 신뢰도 확보
 
-### 사용자 API
-
-| Method | Endpoint | Request Body | 설명 |
-|--------|----------|--------------|------|
-| GET | `/api/coupons` | - | 전체 쿠폰 조회 |
-| POST | `/api/coupons/{id}/issue` | `userId` | 쿠폰 발급 (Pessimistic Lock) |
-| POST | `/api/coupons/{id}/issue-redis` | `userId` | 쿠폰 발급 (Redis) |
-| GET | `/api/coupons/{id}/stock` | - | 재고 확인 |
-| GET | `/api/coupons/my-coupons` | Query: `userId` | 내 쿠폰 조회 |
+**분산 환경의 정합성:**
+- Redis-DB 간 원자성 미보장 이슈 인식
+- try-catch 복구 로직의 한계 경험
 
 ---
 
-## 💡 학습 내용
+## 🔜 다음 단계
 
-- Pessimistic Lock의 특징과 한계
-- Redis를 활용한 분산 환경 동시성 제어
-- 트랜잭션 범위 최적화의 중요성
-- JMeter를 활용한 성능 측정 및 분석
-- 분산 환경에서의 데이터 정합성 이슈
+이 프로젝트를 통해 발견한 추가 개선 가능성:
 
----
-
-## 🔜 고려할 수 있는 개선 방안
-
-- Optimistic Lock 방식 추가 및 성능 비교
-- 커넥션 풀 크기 최적화
-- 로그 출력 최적화
-- 비동기 처리를 통한 응답 속도 개선
-- 재시도 로직 및 정합성 배치 작업 추가
+- **Optimistic Lock 비교**: 충돌률이 낮은 환경에서의 성능 비교
+- **로그 최적화**: show-sql로 인한 I/O 병목 확인, 프로덕션 환경에서 제거 필요
+- **정합성 보장**: 배치 작업 또는 메시지 큐를 통한 최종 정합성 확보 방안
 
 ---
 
