@@ -80,12 +80,21 @@ public class CouponService {
 
     public CouponIssueResponseDto issueCouponWithRedis(Long couponId, CouponIssueRequestDto request) {
         Long userId = request.getUserId();
+        String stockKey = "coupon:stock:" + couponId;
+        String userKey = "coupon:user:" + userId + ":" + couponId;
 
         // 1. Redis 검증/차감 (트랜잭션 밖에서)
         validateAndDecrementStock(couponId, userId);
 
         // 2. DB 저장 (트랜잭션 안에서)
-        return saveToDatabase(couponId, userId);
+        try {
+            return saveToDatabase(couponId, userId);
+        } catch (Exception e) {
+            // 실패 시 Redis 복구
+            redisTemplate.opsForValue().increment(stockKey);
+            redisTemplate.delete(userKey);
+            throw e;
+        }
     }
 
     private void validateAndDecrementStock(Long couponId, Long userId) {
